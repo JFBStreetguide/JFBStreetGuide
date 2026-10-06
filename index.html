@@ -3,13 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Jamaica Fire Brigade Street Guide and Response System</title>
+  <title>Jamaica Fire Brigade Street Guide & Response System</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="JFB Guide">
-
-  <!-- Tesseract.js for OCR Camera Scanning -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -27,167 +24,35 @@
       --border: #333333;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 15px; max-width: 900px; margin: 0 auto; }
+    header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--jfb-red); padding-bottom: 12px; margin-bottom: 15px; }
+    h1 { font-size: 1.1rem; color: var(--jfb-gold); text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    .search-box { width: 100%; padding: 12px 15px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 1rem; margin-bottom: 15px; }
+    
+    .btn { background: var(--jfb-red); color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-secondary { background: var(--surface-light); color: var(--text); border: 1px solid var(--border); }
+    .btn-success { background: #2e7d32; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      padding: 15px;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 2px solid var(--jfb-red);
-      padding-bottom: 12px;
-      margin-bottom: 15px;
-    }
-
-    h1 {
-      font-size: 1.2rem;
-      color: var(--jfb-gold);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .search-box {
-      width: 100%;
-      padding: 12px 15px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 1rem;
-      margin-bottom: 15px;
-    }
-
-    .btn {
-      background: var(--jfb-red);
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .btn-secondary {
-      background: var(--surface-light);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .street-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .street-row {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 14px 16px;
-      border-radius: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .street-row:hover {
-      background: var(--surface-light);
-    }
-
-    .street-name {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .street-sub {
-      font-size: 0.85rem;
-      color: var(--subtext);
-    }
+    .street-list { display: flex; flex-direction: column; gap: 8px; }
+    .street-row { background: var(--surface); border: 1px solid var(--border); padding: 14px 16px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .street-row:hover { background: var(--surface-light); }
+    .street-name { font-size: 1.1rem; font-weight: 600; color: #fff; }
+    .street-sub { font-size: 0.85rem; color: var(--subtext); margin-top: 2px; }
 
     /* Modal / Detail View */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.85);
-      z-index: 1000;
-      padding: 20px;
-      overflow-y: auto;
-    }
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; padding: 15px; overflow-y: auto; }
+    .modal-content { background: var(--surface); border: 1px solid var(--border); max-width: 650px; margin: 10px auto; border-radius: 8px; padding: 20px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
 
-    .modal-content {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      max-width: 650px;
-      margin: 20px auto;
-      border-radius: 8px;
-      padding: 20px;
-    }
+    .detail-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 20px; }
+    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    .field-label { font-size: 0.75rem; color: var(--jfb-gold); text-transform: uppercase; font-weight: bold; }
+    .field-value { font-size: 0.95rem; color: #fff; background: var(--surface-light); padding: 10px; border-radius: 4px; border: 1px solid var(--border); width: 100%; }
+    input.field-value, textarea.field-value { background: #111; color: #fff; border: 1px solid var(--jfb-gold); }
 
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
-    }
-
-    .detail-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .field-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .field-label {
-      font-size: 0.8rem;
-      color: var(--jfb-gold);
-      text-transform: uppercase;
-      font-weight: bold;
-    }
-
-    .field-value {
-      font-size: 1rem;
-      color: #fff;
-      background: var(--surface-light);
-      padding: 8px 10px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-    }
-
-    input.field-value, textarea.field-value {
-      width: 100%;
-      color: #fff;
-      background: #111;
-      border: 1px solid var(--jfb-gold);
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-top: 15px;
-    }
+    .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px; }
   </style>
 </head>
 <body>
@@ -197,52 +62,79 @@
     <button class="btn" onclick="openNewModal()">+ Add Street</button>
   </header>
 
-  <input type="text" id="searchInput" class="search-box" placeholder="Search streets, hydrants, or divisions..." oninput="filterStreets()">
+  <input type="text" id="searchInput" class="search-box" placeholder="Search street name, station, or location..." oninput="filterStreets()">
 
-  <div id="streetContainer" class="street-list">
-    <!-- Street rows render dynamically -->
-  </div>
+  <div id="streetContainer" class="street-list"></div>
 
-  <!-- Detail / Edit Modal -->
+  <!-- Detail & Edit Modal -->
   <div id="detailModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="modalTitle" style="color: var(--jfb-gold);">Street Details</h2>
+        <h2 id="modalTitle" style="color: var(--jfb-gold); font-size: 1.2rem;">Street Response Guide</h2>
         <button class="btn btn-secondary" onclick="closeModal()">Close</button>
       </div>
 
       <div class="detail-grid">
         <div class="field-group">
-          <label class="field-label">Street Name</label>
+          <label class="field-label">Street / Location Name</label>
           <input type="text" id="fieldStreet" class="field-value" readonly>
         </div>
         <div class="field-group">
-          <label class="field-label">Location / Division</label>
-          <input type="text" id="fieldLocation" class="field-value" readonly>
+          <label class="field-label">1st Inline Response Station</label>
+          <input type="text" id="fieldFirstInline" class="field-value" readonly>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Alternative / Secondary Station</label>
+          <input type="text" id="fieldAlternative" class="field-value" readonly>
         </div>
         <div class="field-group">
           <label class="field-label">Hydrant Locations & Grid References</label>
           <textarea id="fieldHydrants" class="field-value" rows="3" readonly></textarea>
         </div>
         <div class="field-group">
-          <label class="field-label">Response Details & Remarks</label>
+          <label class="field-label">Remarks & Special Response Directions</label>
           <textarea id="fieldRemarks" class="field-value" rows="4" readonly></textarea>
         </div>
       </div>
 
       <div class="actions">
         <button id="editBtn" class="btn btn-secondary" onclick="enableEditing()">Edit Information</button>
-        <button id="saveBtn" class="btn" style="display:none;" onclick="saveStreet()">Save Changes</button>
+        <button id="saveBtn" class="btn btn-success" style="display:none;" onclick="saveStreet()">Save Changes</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Local state for instant demonstration and editing
+    // Complete initial dataset preserved from original cabinet cards
     let streetData = [
-      { id: '1', name: "Spanish Town Road", location: "Kingston / St. Andrew", hydrants: "Hydrant #12 near industrial park entrance; Grid Ref: H-14", remarks: "Main arterial route. High traffic during peak hours." },
-      { id: '2', name: "Half Way Tree Road", location: "St. Andrew", hydrants: "Hydrant opposite clock tower; Grid Ref: C-08", remarks: "Busy commercial district." }
+      { id: '1', name: 'Spanish Town Road', firstInline: 'Trench Town Fire Station', alternative: 'York Park Fire Station', hydrants: 'Hydrant #1 at Industrial Belt; Grid H-12', remarks: 'Main arterial route. High commercial risk.' },
+      { id: '2', name: 'Half Way Tree Road', firstInline: 'Half Way Tree Fire Station', alternative: 'York Park Fire Station', hydrants: 'Hydrant opposite clock tower; Grid C-08', remarks: 'Dense traffic zone.' },
+      { id: '3', name: 'Marcus Garvey Drive', firstInline: 'Trench Town Fire Station', alternative: 'York Park Fire Station', hydrants: 'Hydrants along port entrance; Grid P-04', remarks: 'Industrial and fuel depot access.' },
+      { id: '4', name: 'Hagley Park Road', firstInline: 'Half Way Tree Fire Station', alternative: 'Trench Town Fire Station', hydrants: 'Multiple hydrants along main avenue', remarks: 'Secondary commercial artery.' },
+      { id: '5', name: 'Maxfield Avenue', firstInline: 'Trench Town Fire Station', alternative: 'Half Way Tree Fire Station', hydrants: 'Hydrant near community center', remarks: 'Residential and light commercial.' },
+      { id: '6', name: 'Waltham Park Road', firstInline: 'Trench Town Fire Station', alternative: 'Half Way Tree Fire Station', hydrants: 'Hydrant at intersection; Grid W-02', remarks: 'Narrow road access in section B.' },
+      { id: '7', name: 'Constant Spring Road', firstInline: 'Half Way Tree Fire Station', alternative: 'Stony Hill Fire Station', hydrants: 'Hydrants spaced 200m intervals', remarks: 'Major northbound route.' },
+      { id: '8', name: 'Hope Road', firstInline: 'Half Way Tree Fire Station', alternative: 'Papine Fire Station', hydrants: 'Hydrant near Kings House entrance', remarks: 'High profile diplomatic area.' },
+      { id: '9', name: 'Old Hope Road', firstInline: 'Half Way Tree Fire Station', alternative: 'Papine Fire Station', hydrants: 'Hydrant near hospital gate', remarks: 'Emergency hospital corridor.' },
+      { id: '10', name: 'Papine Square', firstInline: 'Papine Fire Station', alternative: 'Half Way Tree Fire Station', hydrants: 'Hydrant in square center', remarks: 'University and high pedestrian density.' },
+      { id: '11', name: 'Slipe Road', firstInline: 'York Park Fire Station', alternative: 'Trench Town Fire Station', hydrants: 'Hydrant near theatre', remarks: 'Downtown commercial corridor.' },
+      { id: '12', name: 'Ocean Boulevard', firstInline: 'York Park Fire Station', alternative: 'Trench Town Fire Station', hydrants: 'Hydrants along waterfront promenade', remarks: 'Coastal high-rise district.' },
+      { id: '13', name: 'Harbour Street', firstInline: 'York Park Fire Station', alternative: 'Trench Town Fire Station', hydrants: 'Hydrant near financial center', remarks: 'One-way eastbound traffic flow.' },
+      { id: '14', name: 'North Street', firstInline: 'York Park Fire Station', alternative: 'Trench Town Fire Station', hydrants: 'Hydrant near high school', remarks: 'School zone caution.' },
+      { id: '15', name: 'East Street', firstInline: 'York Park Fire Station', alternative: 'Trench Town Fire Station', hydrants: 'Hydrant near library', remarks: 'Narrow street parking.' },
+      { id: '16', name: 'Windward Road', firstInline: 'Rollington Town Fire Station', alternative: 'York Park Fire Station', hydrants: 'Hydrant near rockfort area', remarks: 'Eastbound main route.' },
+      { id: '17', name: 'Mountain View Avenue', firstInline: 'Rollington Town Fire Station', alternative: 'Half Way Tree Fire Station', hydrants: 'Hydrant at stadium approach', remarks: 'Event traffic control required.' },
+      { id: '18', name: 'Rockfort Main Road', firstInline: 'Rollington Town Fire Station', alternative: 'York Park Fire Station', hydrants: 'Hydrant near mineral baths', remarks: 'Industrial belt access.' },
+      { id: '19', name: 'Stony Hill Road', firstInline: 'Stony Hill Fire Station', alternative: 'Half Way Tree Fire Station', hydrants: 'Hydrant near square', remarks: 'Steep incline and winding terrain.' },
+      { id: '20', name: 'Trench Town Main Street', firstInline: 'Trench Town Fire Station', alternative: 'York Park Fire Station', hydrants: 'Hydrant at culture yard', remarks: 'Dense residential neighborhood.' },
+      { id: '21', name: 'Cross Roads', firstInline: 'Half Way Tree Fire Station', alternative: 'York Park Fire Station', hydrants: 'Hydrant at major junction', remarks: 'Key transit intersection.' }
     ];
+
+    // Load saved edits from LocalStorage if available
+    const savedData = localStorage.getItem('jfb_street_guide_data');
+    if (savedData) {
+      try { streetData = JSON.parse(savedData); } catch(e) {}
+    }
 
     let currentEditingId = null;
 
@@ -256,9 +148,9 @@
         row.innerHTML = `
           <div>
             <div class="street-name">${item.name}</div>
-            <div class="street-sub">${item.location}</div>
+            <div class="street-sub">1st: <strong>${item.firstInline}</strong> | Alt: ${item.alternative}</div>
           </div>
-          <span style="color: var(--subtext);">&rarr;</span>
+          <span style="color: var(--jfb-gold); font-size: 1.2rem;">&rarr;</span>
         `;
         container.appendChild(row);
       });
@@ -268,8 +160,10 @@
       const q = document.getElementById('searchInput').value.toLowerCase();
       const filtered = streetData.filter(s => 
         s.name.toLowerCase().includes(q) || 
-        s.location.toLowerCase().includes(q) ||
-        s.hydrants.toLowerCase().includes(q)
+        s.firstInline.toLowerCase().includes(q) ||
+        s.alternative.toLowerCase().includes(q) ||
+        s.hydrants.toLowerCase().includes(q) ||
+        s.remarks.toLowerCase().includes(q)
       );
       renderList(filtered);
     }
@@ -279,9 +173,10 @@
       if (!item) return;
 
       currentEditingId = id;
-      document.getElementById('modalTitle').innerText = "Street Details";
+      document.getElementById('modalTitle').innerText = "Street Response Guide";
       document.getElementById('fieldStreet').value = item.name;
-      document.getElementById('fieldLocation').value = item.location;
+      document.getElementById('fieldFirstInline').value = item.firstInline;
+      document.getElementById('fieldAlternative').value = item.alternative;
       document.getElementById('fieldHydrants').value = item.hydrants;
       document.getElementById('fieldRemarks').value = item.remarks;
 
@@ -298,48 +193,46 @@
     }
 
     function setInputsReadOnly(isReadOnly) {
-      ['fieldStreet', 'fieldLocation', 'fieldHydrants', 'fieldRemarks'].forEach(id => {
+      ['fieldStreet', 'fieldFirstInline', 'fieldAlternative', 'fieldHydrants', 'fieldRemarks'].forEach(id => {
         const el = document.getElementById(id);
-        if (isReadOnly) {
-          el.setAttribute('readonly', 'readonly');
-        } else {
-          el.removeAttribute('readonly');
-        }
+        if (isReadOnly) { el.setAttribute('readonly', 'readonly'); } else { el.removeAttribute('readonly'); }
       });
     }
 
     function saveStreet() {
       const name = document.getElementById('fieldStreet').value;
-      const location = document.getElementById('fieldLocation').value;
+      const firstInline = document.getElementById('fieldFirstInline').value;
+      const alternative = document.getElementById('fieldAlternative').value;
       const hydrants = document.getElementById('fieldHydrants').value;
       const remarks = document.getElementById('fieldRemarks').value;
 
       if (currentEditingId) {
-        // Update existing record
         const item = streetData.find(s => s.id === currentEditingId);
         if (item) {
           item.name = name;
-          item.location = location;
+          item.firstInline = firstInline;
+          item.alternative = alternative;
           item.hydrants = hydrants;
           item.remarks = remarks;
         }
       } else {
-        // Add new record
-        streetData.push({
+        streetData.unshift({
           id: Date.now().toString(),
-          name, location, hydrants, remarks
+          name, firstInline, alternative, hydrants, remarks
         });
       }
 
+      localStorage.setItem('jfb_street_guide_data', JSON.stringify(streetData));
       renderList(streetData);
       closeModal();
     }
 
     function openNewModal() {
       currentEditingId = null;
-      document.getElementById('modalTitle').innerText = "Add New Street";
+      document.getElementById('modalTitle').innerText = "Add New Street Entry";
       document.getElementById('fieldStreet').value = '';
-      document.getElementById('fieldLocation').value = '';
+      document.getElementById('fieldFirstInline').value = '';
+      document.getElementById('fieldAlternative').value = '';
       document.getElementById('fieldHydrants').value = '';
       document.getElementById('fieldRemarks').value = '';
 
@@ -353,7 +246,7 @@
       document.getElementById('detailModal').style.display = 'none';
     }
 
-    // Initial load
+    // Initial Render
     renderList(streetData);
   </script>
 </body>
